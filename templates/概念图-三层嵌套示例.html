@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { background:#F0EEE6; }
+</style>
+</head>
+<body>
+<svg width="1200" height="780" viewBox="0 0 1200 780" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="780" fill="#F0EEE6"/>
+
+  <!-- 顶部标识 -->
+  <circle cx="60" cy="58" r="7" fill="#DA7756"/>
+  <text x="82" y="66" font-family="PingFang SC, -apple-system, sans-serif" font-size="22" fill="#7A776F" letter-spacing="1">CLAUDE TAG · 记忆与权限</text>
+
+  <!-- ===== 左：三层同心圆，圆心(380,430) ===== -->
+  <!-- 外圈 Workspace -->
+  <circle cx="380" cy="430" r="300" fill="#DA7756" fill-opacity="0.06" stroke="#DA7756" stroke-opacity="0.4" stroke-width="3" stroke-dasharray="12 9"/>
+  <!-- 中圈 Channel -->
+  <circle cx="380" cy="430" r="195" fill="#DA7756" fill-opacity="0.14" stroke="#DA7756" stroke-opacity="0.75" stroke-width="4"/>
+  <!-- 内圈 Thread -->
+  <circle cx="380" cy="430" r="98" fill="#DA7756" stroke="#2A2825" stroke-width="5"/>
+  <text x="380" y="424" text-anchor="middle" font-family="PingFang SC, -apple-system, sans-serif" font-size="30" font-weight="700" fill="#F0EEE6">Thread</text>
+  <text x="380" y="456" text-anchor="middle" font-family="PingFang SC, -apple-system, sans-serif" font-size="18" fill="#F0EEE6" opacity="0.92">当前任务</text>
+
+  <!-- 圈层标签 -->
+  <text x="380" y="124" text-anchor="middle" font-family="PingFang SC, -apple-system, sans-serif" font-size="22" fill="#7A776F">Workspace · 全公司</text>
+  <text x="380" y="228" text-anchor="middle" font-family="PingFang SC, -apple-system, sans-serif" font-size="22" font-weight="600" fill="#2A2825">Channel · 本频道</text>
+
+  <!-- ===== 右：三行说明 ===== -->
+  <!-- 行1 Thread -->
+  <circle cx="720" cy="288" r="13" fill="#DA7756" stroke="#2A2825" stroke-width="3"/>
+  <text x="750" y="282" font-family="PingFang SC, -apple-system, sans-serif" font-size="27" font-weight="700" fill="#2A2825">Thread context</text>
+  <text x="750" y="312" font-family="PingFang SC, -apple-system, sans-serif" font-size="19" fill="#7A776F">当前这个任务的对话与过程</text>
+
+  <!-- 行2 Channel -->
+  <circle cx="720" cy="408" r="13" fill="#DA7756" fill-opacity="0.5" stroke="#DA7756" stroke-width="3"/>
+  <text x="750" y="402" font-family="PingFang SC, -apple-system, sans-serif" font-size="27" font-weight="700" fill="#2A2825">Channel memory</text>
+  <text x="750" y="432" font-family="PingFang SC, -apple-system, sans-serif" font-size="19" fill="#7A776F">频道长期稳定的规则、决策、项目背景</text>
+
+  <!-- 行3 Workspace -->
+  <circle cx="720" cy="528" r="13" fill="#F0EEE6" stroke="#DA7756" stroke-width="3" stroke-dasharray="4 3"/>
+  <text x="750" y="522" font-family="PingFang SC, -apple-system, sans-serif" font-size="27" font-weight="700" fill="#2A2825">Workspace memory</text>
+  <text x="750" y="552" font-family="PingFang SC, -apple-system, sans-serif" font-size="19" fill="#7A776F">全公司可以共享的记忆</text>
+
+  <!-- 分隔线 -->
+  <line x1="60" y1="648" x2="1140" y2="648" stroke="#DA7756" stroke-opacity="0.3" stroke-width="2"/>
+
+  <!-- 底部旁注 -->
+  <text x="60" y="694" font-family="PingFang SC, -apple-system, sans-serif" font-size="23" font-weight="600" fill="#2A2825">默认只看本频道 · 跨频道需授权</text>
+  <text x="60" y="728" font-family="PingFang SC, -apple-system, sans-serif" font-size="19" fill="#7A776F">这是「数字同事」能被企业接受的安全底线——没有这一层，再聪明也没公司敢用。</text>
+</svg>
+</body>
+</html>
