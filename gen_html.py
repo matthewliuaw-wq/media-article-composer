@@ -6,17 +6,18 @@
 - premailer 把 <style> 里的规则全部 inline 进每个元素的 style=""
   → 公众号后台粘贴时不会被剥样式（公众号会 strip <style> 和 class，只认 inline style）
 
-用法(依赖 markdown+premailer,首次:pip3 install markdown premailer;遇 externally-managed 用 venv,见仓库 README):
-  python3 gen_html.py
+- 列表项内容包进 <p>：公众号编辑器会把 <li> 里的“加粗 + 文字”拆成两行
+
+用法（需先 pip3 install markdown premailer beautifulsoup4）：
+  python3 gen_html.py 文章.md            # 输出同名 .html
+  python3 gen_html.py 文章.md 输出.html
 """
 import re
+import sys
 from pathlib import Path
 import markdown
+from bs4 import BeautifulSoup
 from premailer import transform
-
-ROOT = Path(__file__).resolve().parent
-MD = ROOT / "从我的AI到我们的AI.md"
-OUT = ROOT / "从我的AI到我们的AI.html"
 
 # ---- Anthropic 配色 · 公众号友好 CSS ----
 CSS = """
@@ -148,8 +149,28 @@ CSS = """
 """
 
 
+def wrap_list_items(body: str) -> str:
+    """li 里没有块级元素时，把内容整体包进 <p>，避免公众号编辑器拆行。"""
+    soup = BeautifulSoup(body, "html.parser")
+    for li in soup.find_all("li"):
+        if li.find(["p", "ul", "ol", "section", "div"], recursive=False):
+            continue
+        p = soup.new_tag("p")
+        for child in list(li.contents):
+            p.append(child.extract())
+        li.append(p)
+    return str(soup)
+
+
 def main():
+    if len(sys.argv) < 2:
+        print(__doc__)
+        sys.exit(2)
+    MD = Path(sys.argv[1]).resolve()
+    OUT = Path(sys.argv[2]).resolve() if len(sys.argv) > 2 else MD.with_suffix(".html")
     md_text = MD.read_text(encoding="utf-8")
+    m = re.search(r"^#\s+(.+)$", md_text, flags=re.M)
+    title = m.group(1).strip() if m else MD.stem
 
     # 剥所有 HTML 注释（顶部发布信息块 + 残留占位注释）
     md_text = re.sub(r"<!--.*?-->", "", md_text, flags=re.DOTALL)
@@ -163,6 +184,7 @@ def main():
         output_format="html5",
     )
 
+    body = wrap_list_items(body)
     wrapped = f'<section class="section-wrap">{body}</section>'
 
     html_doc = f"""<!DOCTYPE html>
@@ -170,7 +192,7 @@ def main():
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>从「我的 AI」到「我们的 AI」</title>
+<title>{title}</title>
 <style>
 {CSS}
 </style>

@@ -228,5 +228,5 @@ Style: editorial illustration, warm and humanistic.
 
 > **关于本任务书**
 > - **系列**:Anthropic Economic Index 报告解读 · 二部曲
-> - **作者**:Matthew Liu
+> - **作者**:【作者】
 > - **版本**:v1.0 · 2026 年 8 月

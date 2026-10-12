@@ -1,11 +1,11 @@
 ---
 name: media-article-composer
-description: 公众号文章创作流水线——双模式。模式A二创型：深度解读/二创混剪+个人点评（~4000字）。模式B报告解读型：英文报告翻译+教育者导读+镜像反思（原文完整保留，如 Anthropic Economic Index 系列）。从素材到可发布交付包（md + inline-HTML + 图 + 交付说明）。用户要做公众号深度解读/二创点评/报告翻译解读文章时用。
+description: 公众号文章创作流水线——双模式。模式A二创型：深度解读/二创混剪+个人点评（~4000字）。模式B报告解读型：英文报告翻译+教育者导读+镜像反思（原文完整保留，如 Anthropic Economic Index 系列）。从素材到可发布交付包（md + inline-HTML + 图 + 交付说明），并可用 Playwright 把排好版的文章推送到公众号后台草稿箱（上传配图、填标题作者摘要、粘贴正文、设封面、保存草稿，不代为发表）。用户要做公众号深度解读/二创点评/报告翻译解读文章时用；用户说“发到公众号草稿箱”“上传到草稿箱”“推到公众号后台”“帮我放进公众号编辑器”时也用，即使文章不是本流水线写的。
 ---
 
 # media-article-composer
 
-> **两端分工（2026-09）**：本 SKILL 的前半部分——选题判断、结构设计、解读角度、个人点评的分寸——在任何对话里都适用；交付包生成、inline-HTML 转换、配图下载等执行环节需要在本地跑脚本（`gen_html.py` 与 `templates/` 随本仓库提供，纯对话场景无需理会）。
+> 本 SKILL 前半部分（选题判断、结构设计、解读角度、个人点评的分寸）在任何对话环境都适用；交付包生成、inline-HTML 转换、推送草稿箱等执行环节需要能运行脚本的环境（如 Claude Code），所需依赖见文末“资产与依赖”。
 
 ## 什么时候用
 
@@ -29,8 +29,9 @@ description: 公众号文章创作流水线——双模式。模式A二创型：
 - **公众号后台只认 inline `style="..."`**，会 strip 掉 `<style>` 和 `class` → 必须经 `gen_html.py`（premailer 内联）或 mdnice 处理。
 - **CJK 间粗体用 `<strong>`**，不用 `**`（CommonMark flanking 不认中文字间粗体）。
 - 正文不能嵌 mp4（用后台视频卡片，或转 GIF ≤10MB）。
+- **列表项内容整体包进 `<p>`**：公众号编辑器要求 `<li>` 里是块级内容，`<li><strong>词</strong>：说明</li>` 粘贴后会拆成两行，写成 `<li><p><strong>词</strong>：说明</p></li>`。
 - 封面后台单独传，比例 2.35:1（或 21:9）。
-- 跑脚本用装有 markdown+premailer 的 Python（首次 `pip3 install markdown premailer`；遇 externally-managed 用 venv，见仓库 README「环境自检」）。
+- 跑脚本用装好依赖（`markdown`、`premailer`、`beautifulsoup4`）的 Python 3；系统 Python 不允许直接装包时，先建虚拟环境。
 
 ---
 
@@ -55,9 +56,9 @@ description: 公众号文章创作流水线——双模式。模式A二创型：
 - 命名 `NN-用途.ext`。自制 SVG：写 `*.html` 源 → Chrome headless 渲染 png → 入 images/。模板见 `templates/`。
 
 ### ⑤ 生成 inline-HTML
-- 跑本 skill 目录的 `gen_html.py`（复制到文章项目，改顶部 `MD`/`OUT`）：
+- 跑本 skill 目录的 `gen_html.py`，参数是文章 md（输出同名 .html，也可指定输出路径）：
   ```bash
-  python3 gen_html.py
+  python3 <本 skill 目录>/gen_html.py 文章.md
   ```
 
 ### ⑥ 交付前通读校验（见文末公共校验清单）
@@ -114,9 +115,9 @@ description: 公众号文章创作流水线——双模式。模式A二创型：
 
 ### ⑥ 配图（两类，位置策略不同）
 - **原报告图**：完整保留在翻译正文里，位置照原文，一张不删。
-- **Seedream 视觉隐喻**：只放**导读和镜像**（我们自己的部分），不和原图撞车。定位：原图=「报告看到了什么」（数据），Seedream=「我们怎么理解」（解读）。
-- Seedream 图按任务书生成：统一视觉规范（Anthropic 暖色 #F0EEE6/#2A2825/#DA7756，抽象+极简+人文，无文字无人脸无logo）+ 每张给英文 prompt + 明确放置位置。任务书模板见 `templates/Seedream配图任务书-示例.md`。
-- 封面可用 Seedream 重做（保持系列感），不必用原报告封面。
+- **视觉隐喻图**（任一生图工具，如 Seedream）：只放**导读和镜像**（我们自己的部分），不和原图撞车。定位：原图=「报告看到了什么」（数据），隐喻图=「我们怎么理解」（解读）。
+- 隐喻图按任务书生成：统一视觉规范（Anthropic 暖色 #F0EEE6/#2A2825/#DA7756，抽象+极简+人文，无文字无人脸无logo）+ 每张给英文 prompt + 明确放置位置。任务书模板见 `templates/Seedream配图任务书-示例.md`（换用其他生图工具时格式照用）。
+- 封面可用生图工具重做（保持系列感），不必用原报告封面。
 
 ### ⑦ 脚注内嵌 + 标点规范
 - 脚注 `[^n]` 改行内 `<sup style="font-size:12px;color:#8B7D72;">[n] 内容</sup>`（手机端不用翻到文末），删掉文末注释区。批量脚本：
@@ -129,8 +130,26 @@ description: 公众号文章创作流水线——双模式。模式A二创型：
 
 ### ⑧ inline-HTML + 交付包
 - 跑 `gen_html.py`，多篇文章逐个跑。
-- 交付说明的图片清单要标注来源（原报告图 / Seedream 生成）。
+- 交付说明的图片清单要标注来源（原报告图 / 生图工具生成）。
 - 文章若入 git 仓库：只提交 md + html + images（素材/任务书/模板包/脚本/交付说明为过程文件，不入库）。
+
+---
+
+# 推送草稿箱（两种模式共用，可选）
+
+交付包做好后，用户要直接放进公众号后台时走这一步。详细步骤、可直接用的 Playwright 代码和踩坑清单见 `references/推送草稿箱.md`，动手前先读。
+
+流程概要：
+1. 用户扫码登录（不经手密码），确认账号名；
+2. 配图和 2.35:1 封面批量上传到素材库，读出每张图的微信图链存成 `图链.json`；
+3. 跑 `scripts/swap_wechat_urls.py` 生成可粘贴的正文（换图链、去标题、修列表）；
+4. 新建文章，填标题、作者、摘要，经剪贴板粘贴正文，从图片库选封面；
+5. **停下来**，截图给用户确认后再点“保存为草稿”，再到草稿箱列表核对；
+6. 关闭标签页、删除截图日志，提醒用户手机预览、自行设置原创与合集、自己点发表。
+
+边界：不点“发表”“群发”；编辑器会自动保存，粘贴后草稿即已存在，要如实告知；涉及第三方机构、学员作品与原话等待授权内容，推送前再提醒一次。
+
+本环节为 v0.1，公众号后台改版后选择器可能失效；遇到新问题请补进参考文档的踩坑清单。
 
 ---
 
@@ -159,6 +178,11 @@ description: 公众号文章创作流水线——双模式。模式A二创型：
 
 输出：列出所有可疑处（带定位），**和用户逐条确认后再改**——不要自作主张批量改，作者语感优先。
 
-## 资产（本 skill 目录）
-- `gen_html.py` — md→inline-HTML 渲染脚本（Anthropic 配色 CSS）。复制到文章项目，改 `MD`/`OUT` 即可。
+## 资产与依赖（本 skill 目录）
+
+依赖：Python 3 + `pip3 install markdown premailer beautifulsoup4`；推送草稿箱另需 Playwright MCP（`claude mcp add playwright npx @playwright/mcp@latest`）。
+
+- `gen_html.py` — md→inline-HTML 渲染脚本（Anthropic 配色 CSS，列表项自动包 `<p>`）。用法：`python3 gen_html.py 文章.md [输出.html]`。
+- `scripts/swap_wechat_urls.py` — 排版 HTML → 可粘贴进公众号编辑器的正文（本地图片换微信图链、去 `<h1>`、列表项包 `<p>`、超 2 万字提醒）。
+- `references/推送草稿箱.md` — 推送草稿箱的完整步骤、Playwright 代码、踩坑清单与案例记录。
 - `templates/` — SVG 图表模板（封面/概念图/金句卡，模式 A 用）+ `报告导读模板包.md`（RG-1~RG-5，模式 B 用）+ `Seedream配图任务书-示例.md`（模式 B 用）。
